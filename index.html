@@ -454,28 +454,40 @@
             startY = clientY - translateY;
           }
 
-          function drag(e) {
-            if (!isDragging || scale === 1) return;
-            e.preventDefault();
-            
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
-            
-            translateX = clientX - startX;
-            translateY = clientY - startY;
-            
-            // Apply boundaries to prevent dragging too far
-            const imgRect = image.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
-            
-            const maxX = (imgRect.width * scale - containerRect.width) / 2;
-            const maxY = (imgRect.height * scale - containerRect.height) / 2;
-            
-            translateX = Math.min(maxX, Math.max(-maxX, translateX));
-            translateY = Math.min(maxY, Math.max(-maxY, translateY));
-            
-            applyTransform();
-          }
+          
+function drag(e) {
+  if (!isDragging || scale === 1) return;
+  e.preventDefault();
+
+  const clientX = e.clientX ?? e.touches?.[0]?.clientX;
+  const clientY = e.clientY ?? e.touches?.[0]?.clientY;
+
+  // Calculate movement since last frame
+  const deltaX = (clientX - startX) / scale;
+  const deltaY = (clientY - startY) / scale;
+
+  startX = clientX;
+  startY = clientY;
+
+  // Apply delta to translation
+  translateX += deltaX;
+  translateY += deltaY;
+
+  // Optionally: clamp within bounds
+  const imgRect = image.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+
+  const maxX = Math.max((imgRect.width * scale - containerRect.width) / 2 / scale, 0);
+  const maxY = Math.max((imgRect.height * scale - containerRect.height) / 2 / scale, 0);
+
+  translateX = Math.min(maxX, Math.max(-maxX, translateX));
+  translateY = Math.min(maxY, Math.max(-maxY, translateY));
+
+  // Use requestAnimationFrame for ultra-smooth transform
+  requestAnimationFrame(applyTransform);
+}
+
+
 
           function endDrag() {
             isDragging = false;
