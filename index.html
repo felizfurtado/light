@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Photo Editor UI - Left Screen</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        font-family: "Urbanist", sans-serif;
+        background-color: #000;
+        touch-action: none;
+      }
+
+      .editor-layout {
+        width: 100%;
+        max-width: 420px;
+        height: 100%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .image-section {
+        flex: 8.7;
+        position: relative;
+        background-color: #000;
+        overflow: hidden;
+        touch-action: none;
+      }
+
+      .image-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        touch-action: none;
+      }
+
+      .image-section img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+        touch-action: none;
+      }
+
+      .top-icons {
+        position: absolute;
+        top: 16px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        padding: 0 16px;
+        z-index: 2;
+      }
+
+      .top-icons .icon {
+        background-color: #fff;
+        color: #000;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        cursor: pointer;
+        box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+      }
+
+      .toolbar {
+        flex: 1.2;
+        overflow-x: auto;
+        background-color: #000;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 20px;
+        z-index: 100;
+      }
+
+      .tool {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 500;
+        flex-shrink: 0;
+        min-width: 60px;
+        z-index: 100;
+      }
+
+      .tool i {
+        background-color: #1a1a1a;
+        border-radius: 50%;
+        padding: 12px;
+        margin-bottom: 5px;
+        font-size: 16px;
+      }
+
+      /* Optional: Hide scroll bar */
+      .toolbar::-webkit-scrollbar {
+        display: none;
+      }
+      .toolbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="editor-layout">
+      <!-- Image Section -->
+      <div class="image-section">
+        <div class="image-container">
+          <img
+            src="https://i.pinimg.com/736x/15/56/0d/15560d2f104304aee9efc241f7dd6a6e.jpg"
+            alt="Portrait"
+            id="editableImage"
+          />
+        </div>
+
+        <!-- Top Left & Right Icons -->
+        <div class="top-icons">
+          <div class="icon"><i class="fa-solid fa-arrow-left"></i></div>
+          <div class="icon"><i class="fa-solid fa-download"></i></div>
+        </div>
+      </div>
+
+      <!-- Scrollable Toolbar -->
+      <div class="toolbar">
+        <div class="tool">
+          <i class="fa-solid fa-sun"></i>
+          <span>Light</span>
+        </div>
+
+        <div class="tool">
+          <i class="fa-solid fa-droplet"></i>
+          <span>Tone</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-brush"></i>
+          <span>Style</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-bezier-curve"></i>
+          <span>Curve</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-crop-simple"></i>
+          <span>Framing</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-magic-wand-sparkles"></i>
+          <span>Enhance</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-eye-dropper"></i>
+          <span>Color Mix</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-vector-square"></i>
+          <span>Perspective</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-glasses"></i>
+          <span>Lens</span>
+        </div>
+        <div class="tool">
+          <i class="fa-solid fa-shapes"></i>
+          <span>Overlay</span>
+        </div>
+      </div>
+
+      <style>
+        .bottom-sheet {
+          position: fixed;
+          bottom: -100%;
+          left: 0;
+          width: 100%;
+          background-color: #000;
+          color: white;
+          border-radius: 20px 20px 0 0;
+          box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.7);
+          transition: bottom 0.35s ease;
+          z-index: 3;
+          overflow-y: auto;
+          padding: 32px 20px 48px;
+          backdrop-filter: blur(10px);
+        }
+
+        .bottom-sheet.active {
+          bottom: 12vh;
+        }
+
+        .popup-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+        }
+
+        .popup-header h2 {
+          font-size: 18px;
+          color: #ddd;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .close-icon {
+          font-size: 20px;
+          cursor: pointer;
+          color: #999;
+        }
+
+        .popup-content {
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+        }
+
+        .slider-group {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .slider-group label {
+          font-size: 14px;
+          color: #bbb;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .slider-value {
+          font-size: 13px;
+          color: #aaa;
+          min-width: 30px;
+          text-align: right;
+        }
+
+        .slider-track {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .slider-group input[type="range"] {
+          -webkit-appearance: none;
+          flex: 1;
+          height: 4px;
+          background: #333;
+          border-radius: 2px;
+          outline: none;
+        }
+
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 16px;
+          height: 16px;
+          background: white;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+
+        .slider-group input[type="range"]::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: white;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+        }
+      </style>
+
+      <div class="bottom-sheet" id="lightPopup">
+        <div class="popup-header">
+          <h2><i class="fa-solid fa-sun"></i> Light</h2>
+          <i class="fa-solid fa-xmark close-icon"></i>
+        </div>
+        <div class="popup-content">
+          <div class="slider-group">
+            <label>Brightness <span class="slider-value" id="val-brightness">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('brightness', this.value)" />
+            </div>
+          </div>
+          <div class="slider-group">
+            <label>Contrast <span class="slider-value" id="val-contrast">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('contrast', this.value)" />
+            </div>
+          </div>
+          <div class="slider-group">
+            <label>Highlights <span class="slider-value" id="val-highlights">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('highlights', this.value)" />
+            </div>
+          </div>
+          <div class="slider-group">
+            <label>Shadows <span class="slider-value" id="val-shadows">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('shadows', this.value)" />
+            </div>
+          </div>
+          <div class="slider-group">
+            <label>Whites <span class="slider-value" id="val-whites">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('whites', this.value)" />
+            </div>
+          </div>
+          <div class="slider-group">
+            <label>Blacks <span class="slider-value" id="val-blacks">0</span></label>
+            <div class="slider-track">
+              <input type="range" min="-100" max="100" value="0" oninput="updateValue('blacks', this.value)" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function updateValue(type, value) {
+          document.getElementById(`val-${type}`).innerText = value;
+        }
+        
+        document.addEventListener("DOMContentLoaded", function () {
+          const lightPopup = document.getElementById("lightPopup");
+          const lightTool = document.querySelectorAll(".tool")[0]; // First tool
+          const closeBtn = lightPopup.querySelector(".close-icon");
+
+          // Open popup
+          lightTool.addEventListener("click", () => {
+            lightPopup.classList.toggle("active");
+          });
+
+          // Close popup
+          closeBtn.addEventListener("click", () => {
+            lightPopup.classList.remove("active");
+          });
+        });
+
+        // Image zoom and pan functionality
+        document.addEventListener('DOMContentLoaded', function() {
+          const image = document.getElementById('editableImage');
+          const container = document.querySelector('.image-container');
+          
+          let scale = 1;
+          let isDragging = false;
+          let startX, startY, translateX = 0, translateY = 0;
+          let lastTap = 0;
+          let doubleTapTimeout;
+
+          // Reset to initial state
+          function resetImage() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            applyTransform();
+          }
+
+          // Apply current transform to image
+          function applyTransform() {
+            image.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+          }
+
+          // Handle double tap to zoom in/out
+          function handleDoubleTap() {
+            if (scale === 1) {
+              // Zoom in to 2x scale
+              scale = 2;
+              
+              // Get tap position relative to image
+              const rect = image.getBoundingClientRect();
+              const offsetX = (startX - rect.left) / scale;
+              const offsetY = (startY - rect.top) / scale;
+              
+              // Adjust translate to center on tap point
+              translateX = (container.clientWidth / 2 - offsetX * scale) - (container.clientWidth - image.width * scale) / 2;
+              translateY = (container.clientHeight / 2 - offsetY * scale) - (container.clientHeight - image.height * scale) / 2;
+            } else {
+              // Zoom out to 1x scale
+              resetImage();
+            }
+            applyTransform();
+          }
+
+          // Touch/mouse events
+          container.addEventListener('mousedown', startDrag);
+          container.addEventListener('touchstart', startDrag);
+          
+          container.addEventListener('mousemove', drag);
+          container.addEventListener('touchmove', drag);
+          
+          container.addEventListener('mouseup', endDrag);
+          container.addEventListener('mouseleave', endDrag);
+          container.addEventListener('touchend', endDrag);
+          
+          container.addEventListener('dblclick', handleDoubleTap);
+          
+          // Touch events for double tap
+          container.addEventListener('touchstart', function(e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            
+            if (tapLength < 300 && tapLength > 0) {
+              // Double tap detected
+              clearTimeout(doubleTapTimeout);
+              e.preventDefault();
+              const touch = e.touches[0] || e.changedTouches[0];
+              startX = touch.clientX;
+              startY = touch.clientY;
+              handleDoubleTap();
+            } else {
+              // Single tap
+              doubleTapTimeout = setTimeout(function() {
+                clearTimeout(doubleTapTimeout);
+              }, 300);
+            }
+            lastTap = currentTime;
+          });
+
+          function startDrag(e) {
+            if (scale === 1) return;
+            
+            isDragging = true;
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            startX = clientX - translateX;
+            startY = clientY - translateY;
+          }
+
+          function drag(e) {
+            if (!isDragging || scale === 1) return;
+            e.preventDefault();
+            
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            translateX = clientX - startX;
+            translateY = clientY - startY;
+            
+            // Apply boundaries to prevent dragging too far
+            const imgRect = image.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            const maxX = (imgRect.width * scale - containerRect.width) / 2;
+            const maxY = (imgRect.height * scale - containerRect.height) / 2;
+            
+            translateX = Math.min(maxX, Math.max(-maxX, translateX));
+            translateY = Math.min(maxY, Math.max(-maxY, translateY));
+            
+            applyTransform();
+          }
+
+          function endDrag() {
+            isDragging = false;
+          }
+
+          // Initialize with padding
+          resetImage();
+        });
+      </script>
+    </div>
+  </body>
+</html>
